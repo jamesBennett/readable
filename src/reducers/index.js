@@ -52,12 +52,8 @@ import {
           } : post
         )
       case DELETE_POST :
-        return state.map(post => 
-          (post.id === action.post.id) ? {
-            ...post,
-            deleted: action.post.deleted
-          } : post
-        )
+        return state.filter(post => post.id !== action.post.id);
+        
       case VOTE_POST :
         return state.map(post => 
           (post.id === action.post.id) ? {

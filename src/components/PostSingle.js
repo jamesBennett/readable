@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import Comments from './Comments';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Redirect } from 'react-router-dom';
 import Votescore from '../components/VoteScore';
-import {getPost} from '../actions/postActions';
+import {getPost, deletePost} from '../actions/postActions';
 import * as connector from '../utils/readableconnector';
 
 export class PostSingle extends Component {
 
     state = {
-        post: {}
+        post: {},
+        redirect: false
     }
 
     componentDidMount() {
@@ -20,6 +21,14 @@ export class PostSingle extends Component {
 
     componentWillReceiveProps(nextProps) {
        this.setState({post: nextProps.posts.posts.filter(post => post.id === nextProps.match.params.id)[0]})
+    }
+
+    deletePost = () => {
+        connector.deletePost(this.state.post.id).then((post) => {
+            console.log(post)
+            this.props.dispatch(deletePost(post));
+        })
+        this.setState({redirect: true})
     }
 
     render(){
@@ -43,6 +52,17 @@ export class PostSingle extends Component {
                     </p>
                     <Comments postID={this.props.match.params.id} />
                 </article>
+                <footer>
+                    <a href="#" >EDIT</a>
+                    <a href="#" onClick={this.deletePost} >DELETE</a>
+                </footer>
+                {
+                    this.state.redirect
+                    ?
+                    <Redirect to="/" />
+                    :
+                    null
+                }
             </div>
         )
     }
@@ -54,4 +74,4 @@ function mapStateToProps(posts) {
     };
 }
 
-export default connect(mapStateToProps)(PostSingle);
+export default withRouter(connect(mapStateToProps)(PostSingle));
