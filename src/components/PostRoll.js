@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
+import Votescore from '../components/VoteScore';
+
 export class PostRoll extends Component {
     componentWillReceiveProps(nextProps) {
         let posts = nextProps.posts.filter(post => post.deleted !== true).sort( (a, b) => {
@@ -27,6 +29,7 @@ export class PostRoll extends Component {
                    <div key={key}> 
                        <h4>AUTHOR: {post.author}</h4>
                        <div>TITLE: {post.title}</div>
+                        <Votescore postID={post.id} voteScore={post.voteScore}  />
                        <Link to={`/${post.category}/${post.id}`} >Full Post</Link>
                    </div>
                )) : null}

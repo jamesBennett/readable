@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import serializeForm from 'form-serialize';
-import {getComments, deleteComment, editComment} from '../actions/commentActions';
+import {getComments, deleteComment, editComment, voteComment} from '../actions/commentActions';
 import * as connector from '../utils/readableconnector';
 
 class Comments extends Component {
@@ -12,14 +12,30 @@ class Comments extends Component {
         comments: []
     }
 
+    constructor(props) {
+        super(props);
+        
+    }
+
     componentDidMount() {
         connector.getPostComments(this.props.postID).then((comments) => {
             comments = comments.filter(comment => !comment.deleted).sort((a, b) => {
                 return a.voteScore < b.voteScore;
             });
             this.props.dispatch(getComments({comments}))
-            this.setState({comments})
         });
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.setState(
+            {
+                comments: nextProps.comments
+                    .filter(comment => !comment.deleted).sort((a, b) => {
+                        return a.voteScore < b.voteScore;
+                    }
+                )
+            }
+        );
     }
 
     deleteComment = (event) => {
@@ -46,6 +62,11 @@ class Comments extends Component {
         });
     }
 
+    vote = (id, vote) => {
+        connector.voteComment(id, vote).then((comment) => {
+            this.props.dispatch(voteComment({comment}));
+        });
+    }
 
 
     render() {
@@ -57,11 +78,16 @@ class Comments extends Component {
         return (
             <section className="comments">
                 {
-                    this.props.comments.filter(comment => !comment.deleted).map(comment => (
+                    this.state.comments.filter(comment => !comment.deleted).map(comment => (
                         <div className="comment" key={comment.id }>
                            <article>
                                 <p>{comment.body}</p>
                                 <p className="comment-author">- {comment.author}</p>
+                                <aside>
+                                    <a href="#" onClick={ () => this.vote(comment.id, 'upVote') } >up</a>
+                                    {comment.voteScore}
+                                    <a href="#" onClick={ () => this.vote(comment.id, 'downVote') } >down</a>
+                                </aside>
                                 <footer>
                                     <button onClick={ this.showModal } value={comment.id}>Edit</button>  
                                     <button onClick={ this.deleteComment } value={comment.id} >Delete</button>  

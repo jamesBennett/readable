@@ -5,7 +5,8 @@ import {
     ADD_POST,
     EDIT_POST,
     DELETE_POST,
-    VOTE_POST
+    VOTE_POST,
+    GET_POST
   } from '../actions/postActions';
 
   import {
@@ -18,6 +19,13 @@ import {
 
   function posts (state = [], action) {
     switch (action.type) {
+
+      case GET_POST : 
+        return state.map(post => 
+          (post.id === action.id) ? {
+            ...action.post,
+          } : post
+      )
       case GET_POSTS :
         return action.posts;
       case ADD_POST :

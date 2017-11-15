@@ -9,8 +9,7 @@ class PostsCategory extends React.Component {
     }
 
     componentDidMount(){
-     this.setState({posts: this.props.posts.posts.filter(post => post.category === this.props.match.params.category)})
-        
+        this.setState({posts: this.props.posts.posts})  
     }
 
     componentWillReceiveProps(nextprops) {

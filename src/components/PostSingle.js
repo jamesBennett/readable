@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import Comments from './Comments';
 import { withRouter } from 'react-router-dom';
+import Votescore from '../components/VoteScore';
+import {getPost} from '../actions/postActions';
+import * as connector from '../utils/readableconnector';
 
 export class PostSingle extends Component {
 
@@ -9,11 +12,14 @@ export class PostSingle extends Component {
         post: {}
     }
 
-    componentDidMount(){
-        this.setState( { post: this.props.posts.posts.filter(post => post.id === this.props.match.params.id)[0] } );
-    }
-    componentWillReceiveProps(nextprops) {
-        this.setState( { post: nextprops.posts.posts.filter(post => post.id === nextprops.match.params.id)[0] } );
+    componentDidMount() {
+        connector.getPost(this.props.match.params.id).then((post) => {
+            this.props.dispatch(getPost({post}));
+        });
+      }
+
+    componentWillReceiveProps(nextProps) {
+       this.setState({post: nextProps.posts.posts.filter(post => post.id === nextProps.match.params.id)[0]})
     }
 
     render(){
@@ -23,7 +29,7 @@ export class PostSingle extends Component {
         return (
             <div className="singlePost">
                 <div className="vote">
-                    Vote me up
+                    <Votescore postID={this.state.post.id} voteScore={this.state.post.voteScore}  />
                 </div>
                 <article>
                     <h4>
@@ -35,8 +41,7 @@ export class PostSingle extends Component {
                     <p>
                         author, {this.state.post.author}
                     </p>
-                    <h5>{this.state.post.id}</h5>
-                    <Comments postID={this.state.post.id} />
+                    <Comments postID={this.props.match.params.id} />
                 </article>
             </div>
         )
