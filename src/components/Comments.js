@@ -12,11 +12,6 @@ class Comments extends Component {
         comments: []
     }
 
-    constructor(props) {
-        super(props);
-        
-    }
-
     componentDidMount() {
         connector.getPostComments(this.props.postID).then((comments) => {
             comments = comments.filter(comment => !comment.deleted).sort((a, b) => {

@@ -15,6 +15,9 @@ class App extends React.Component {
       this.props.dispatch(getPosts({posts}))
     });
   }
+  // componentWillReceiveProps() {
+
+  // }
 
   render() {
     return (
@@ -30,6 +33,7 @@ class App extends React.Component {
           <section>
             <Switch>
               <Route exact path="/" component={PostCategory}/>
+              <Route path="/add/:id" component={PostForm}/>
               <Route path="/add" component={PostForm}/>
               <Route path="/:category/:id" component={PostSingle} />
               <Route path="/:category" component={PostCategory}/>
