@@ -44,13 +44,8 @@ import {
           }
         ]
       case EDIT_POST :
-        return state.map(post => 
-          (post.id === action.id) ? {
-            ...post,
-            title: action.title,
-            body: action.body
-          } : post
-        )
+        return state.map(post => (post.id === action.post.id) ? action.post : post)
+
       case DELETE_POST :
         return state.filter(post => post.id !== action.post.id);
         

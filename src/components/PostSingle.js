@@ -5,6 +5,8 @@ import { withRouter, Redirect, Link } from 'react-router-dom';
 import Votescore from '../components/VoteScore';
 import {getPost, deletePost} from '../actions/postActions';
 import * as connector from '../utils/readableconnector';
+import Button from 'material-ui/Button';
+import Grid from 'material-ui/Grid';
 
 export class PostSingle extends Component {
 
@@ -14,7 +16,8 @@ export class PostSingle extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-       this.setState({post: nextProps.posts.posts.filter(post => post.id === nextProps.match.params.id)[0]})
+        const  { posts, match } = nextProps;
+       this.setState({post: posts.posts.filter(post => post.id === match.params.id)[0]})
     }
 
     deletePost = () => {
@@ -26,13 +29,14 @@ export class PostSingle extends Component {
 
     render(){
         if(this.state.post === undefined) {
-            return null
+            return <Redirect to="/404" />
         } 
         return (
-            <div className="singlePost">
-                <div className="vote">
+            <Grid container justify="center" spacing={24} className="singlePost">
+                <Grid item className="vote" md={2}>
                     <Votescore postID={this.state.post.id} voteScore={this.state.post.voteScore}  />
-                </div>
+                </Grid>
+                <Grid item md={8}>
                 <article>
                     <h4>
                         {this.state.post.title}
@@ -45,10 +49,15 @@ export class PostSingle extends Component {
                     </p>
                     <Comments postID={this.props.match.params.id} />
                 </article>
-                <footer>
-                    <Link to={`/add/${this.state.post.id}`} >EDIT </Link>
-                    <a href="#" onClick={this.deletePost} >DELETE</a>
-                </footer>
+                </Grid>
+                <Grid item md={8}>
+                    <footer>
+                        <Link to={`/add/${this.state.post.id}`} >
+                            <Button raised color="primary" >Edit</Button>
+                        </Link>
+                        <Button raised color="accent" onClick={this.deletePost} >DELETE</Button>
+                    </footer>
+                </Grid>
                 {
                     this.state.redirect
                     ?
@@ -56,7 +65,7 @@ export class PostSingle extends Component {
                     :
                     null
                 }
-            </div>
+            </Grid>
         )
     }
 }

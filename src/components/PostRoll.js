@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import Votescore from '../components/VoteScore';
+import Button from 'material-ui/Button'
 
 export class PostRoll extends Component {
     componentWillReceiveProps(nextProps) {
@@ -30,7 +31,8 @@ export class PostRoll extends Component {
                        <h4>AUTHOR: {post.author}</h4>
                        <div>TITLE: {post.title}</div>
                         <Votescore postID={post.id} voteScore={post.voteScore}  />
-                       <Link to={`/${post.category}/${post.id}`} >Full Post</Link>
+                       <Link to={`/${post.category}/${post.id}`} >
+                        <Button raised color="primary" >Full Post</Button></Link>
                    </div>
                )) : null}
             </div>

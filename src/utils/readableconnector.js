@@ -1,4 +1,4 @@
-const api = 'http://localhost:3001';
+const api = 'http://localhost:3001' || `${process.env.REACT_APP_BACKEND}`;
 
 // Generate a unique token for storing data on the backend server.
 let token = localStorage.token

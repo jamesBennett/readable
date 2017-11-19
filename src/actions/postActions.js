@@ -27,12 +27,10 @@ export function addPost ({ post }) {
   }
 }
 
-export function editPost (id, title, body) {
+export function editPost ({post}) {
   return {
     type: EDIT_POST,
-    id,
-    title,
-    body
+    post
   }
 }
 

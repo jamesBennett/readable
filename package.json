@@ -5,6 +5,8 @@
   "dependencies": {
     "capitalize": "^1.0.0",
     "form-serialize": "^0.7.2",
+    "material-ui": "^1.0.0-beta.21",
+    "material-ui-icons": "^1.0.0-beta.17",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-icons": "^2.2.7",

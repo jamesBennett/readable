@@ -1,15 +1,18 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import serializeForm from 'form-serialize';
-import {getComments, deleteComment, editComment, voteComment} from '../actions/commentActions';
+import {getComments, deleteComment, editComment, voteComment, addComment} from '../actions/commentActions';
 import * as connector from '../utils/readableconnector';
+import rid from 'readable-id';
+import Button from 'material-ui/Button';
 
 class Comments extends Component {
 
     state = {
         showEditModal: false,
         toEdit: {},
-        comments: []
+        comments: [],
+        addNewComment: false
     }
 
     componentDidMount() {
@@ -39,8 +42,15 @@ class Comments extends Component {
         });
     }
 
+    
     toggleModal = (showEditModal) => {
         this.setState({showEditModal})
+        if(!showEditModal) {
+            this.setState({
+                showEditModal: false,
+                addNewComment: false
+            })
+        }
     }
 
     showModal = (event) => {
@@ -51,10 +61,25 @@ class Comments extends Component {
     submitEditedComment = (event) => {
         event.preventDefault();
         const form = serializeForm(event.target, { hash: true });
-        connector.updateComment(this.state.toEdit.id, Date.now(), form.body).then((comment) => {
-            this.props.dispatch(editComment(comment.id, comment.timeStamp, comment.body))
-            this.toggleModal(false)
-        });
+        if(form.author){
+            let id = rid();
+            connector.addComment(
+                id,
+                Date.now(),
+                form.body,
+                form.author,
+                this.props.postID
+            ).then(comment => {
+                this.props.dispatch(addComment({comment}));
+                this.toggleModal(false)
+            })
+        } else {
+            connector.updateComment(this.state.toEdit.id, Date.now(), form.body).then((comment) => {
+                this.props.dispatch(editComment(comment.id, comment.timeStamp, comment.body))
+                this.toggleModal(false)
+            });
+        }
+        
     }
 
     vote = (id, vote) => {
@@ -63,15 +88,67 @@ class Comments extends Component {
         });
     }
 
+    addNewLightBox = () => {
+        this.setState({
+            showEditModal: true,
+            addNewComment: true,
+        })
+    }
+
+    renderLightBox = () => {
+        return (
+            <div className="lightBox-Wrapper">
+            <div className="lightBox">
+                <header>EDIT</header>
+                <form className="editCommentForm" onSubmit={this.submitEditedComment} > 
+                    <ul>
+                        {
+                            this.state.addNewComment ?
+                                <li>
+                                    <label htmlFor="author">Author</label>
+                                    <input id="author" type="text" name="author" />
+                                </li>
+                                :
+                                null
+                        }
+                        
+                        <li>
+                            <label>Body</label>
+                            <textarea id="body" name="body" defaultValue={this.state.toEdit.body} />
+                        </li>
+                    </ul>
+                <footer>
+                    <Button raised color="accent" onClick={() => this.toggleModal(false)}>close</Button>
+                    <Button raised color="primary" type='submit' >Submit</Button>
+                </footer>
+                </form>
+            </div>
+        </div>
+        )
+    }
 
     render() {
         if(this.props.comments.length === 0){
             return (
-                <div>no comments</div>
+                <div>
+                <a href="#" onClick={this.addNewLightBox}>Add new comment</a>
+                {
+                    this.state.showEditModal 
+                        ?
+                            this.renderLightBox()
+                        :
+                            null 
+                }
+                </div>
+                
             );
         }
         return (
             <section className="comments">
+                {
+                    <h3>With {this.state.comments.length} comments</h3>
+                }
+                <Button color="primary" onClick={this.addNewLightBox}>Add new comment</Button>
                 {
                     this.state.comments.filter(comment => !comment.deleted).map(comment => (
                         <div className="comment" key={comment.id }>
@@ -91,29 +168,13 @@ class Comments extends Component {
                         </div>
                     ))
                 }
-            {
-                this.state.showEditModal 
-                    ?
-                        <div className="lightBox-Wrapper">
-                            <div className="lightBox">
-                                <header>EDIT</header>
-                                <form className="editCommentForm" onSubmit={this.submitEditedComment} > 
-                                    <ul>
-                                        <li>
-                                            <label>Body</label>
-                                            <textarea id="body" name="body" defaultValue={this.state.toEdit.body} />
-                                        </li>
-                                    </ul>
-                                <footer>
-                                    <button onClick={() => this.toggleModal(false)}>close</button>
-                                    <button type='submit' >Submit</button>
-                                </footer>
-                                </form>
-                            </div>
-                        </div>
-                    :
-                        null 
-            }
+                {
+                    this.state.showEditModal 
+                        ?
+                            this.renderLightBox()
+                        :
+                            null 
+                }
             </section>
         )
         

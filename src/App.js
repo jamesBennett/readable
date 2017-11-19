@@ -8,6 +8,7 @@ import {getPosts} from './actions/postActions';
 import CategoryList from './components/CategoryList';
 import PostCategory from './components/PostsCategory';
 import PostSingle from './components/PostSingle';
+import ErrorPage from './components/ErrorPage';
 
 class App extends React.Component {
   componentDidMount() {
@@ -32,11 +33,13 @@ class App extends React.Component {
           </aside>
           <section>
             <Switch>
+            <Route path="/404" component={ErrorPage} />
               <Route exact path="/" component={PostCategory}/>
               <Route path="/add/:id" component={PostForm}/>
               <Route path="/add" component={PostForm}/>
               <Route path="/:category/:id" component={PostSingle} />
               <Route path="/:category" component={PostCategory}/>
+              
             </Switch>
           </section>
         </div>
