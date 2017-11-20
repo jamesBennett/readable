@@ -28,8 +28,8 @@ export class PostSingle extends Component {
     }
 
     render(){
-        if(this.state.post === undefined) {
-            return <Redirect to="/404" />
+        if( this.state.post === undefined) {
+            return <h1>POST NOT FOUND</h1>
         } 
         return (
             <Grid container justify="center" spacing={24} className="singlePost">
