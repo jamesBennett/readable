@@ -4,6 +4,9 @@ import Votescore from '../components/VoteScore';
 import Button from 'material-ui/Button'
 
 export class PostRoll extends Component {
+    state ={
+        posts: []
+    }
     componentWillReceiveProps(nextProps) {
         let posts = nextProps.posts.filter(post => post.deleted !== true).sort( (a, b) => {
             return a.voteScore < b.voteScore;
@@ -18,6 +21,9 @@ export class PostRoll extends Component {
         this.setState({posts})
     }
     render() {
+        if(this.state.posts.length == 0) {
+            return <h1>No Posts where found</h1>
+        }
         return (
             <div>
                 <label>Sort by</label>
