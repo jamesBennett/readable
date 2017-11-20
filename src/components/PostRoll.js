@@ -1,17 +1,34 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import Votescore from '../components/VoteScore';
-import Button from 'material-ui/Button'
+import Button from 'material-ui/Button';
+import {connect} from 'react-redux';
+import {deletePost} from '../actions/postActions';
+import * as connector from '../utils/readableconnector';
+import { withRouter } from 'react-router-dom';
 
 export class PostRoll extends Component {
     state ={
         posts: []
     }
     componentWillReceiveProps(nextProps) {
-        let posts = nextProps.posts.filter(post => post.deleted !== true).sort( (a, b) => {
-            return a.voteScore < b.voteScore;
-        });
-        this.setState({posts})
+        const {posts, match} = nextProps;
+        let nextPosts = [];
+        if(!match.params.category){
+            nextPosts = posts.posts.filter(post => post.deleted !== true)
+            .sort( (a, b) => {
+                return a.voteScore < b.voteScore;
+            }); 
+        }else {
+            nextPosts = posts.posts
+                .filter(post => post.category === match.params.category )
+                .filter(post => post.deleted !== true)
+                .sort( (a, b) => {
+                    return a.voteScore < b.voteScore;
+                }); 
+        }
+
+        this.setState({posts: nextPosts})
     }
 
     changeSort = (sortby) => {
@@ -20,6 +37,13 @@ export class PostRoll extends Component {
         });
         this.setState({posts})
     }
+
+    deletePost = (id) => {
+        connector.deletePost(id).then((post) => {
+            this.props.dispatch(deletePost(post));
+        })
+    }
+
     render() {
         if(this.state.posts.length == 0) {
             return <h1>No Posts where found</h1>
@@ -39,6 +63,12 @@ export class PostRoll extends Component {
                         <Votescore postID={post.id} voteScore={post.voteScore}  />
                        <Link to={`/${post.category}/${post.id}`} >
                         <Button raised color="primary" >Full Post</Button></Link>
+                        <footer>
+                            <Link to={`/add/${post.id}`} >
+                                <Button raised color="primary" >Edit</Button>
+                            </Link>
+                            <Button raised color="accent" onClick={() => {this.deletePost(post.id)}} >DELETE</Button>
+                        </footer>
                    </div>
                )) : null}
             </div>
@@ -46,4 +76,10 @@ export class PostRoll extends Component {
     }
 }
 
-export default PostRoll;
+function mapStateToProps(posts) {
+    return {
+        posts
+    };
+}
+
+export default withRouter(connect(mapStateToProps)(PostRoll));
